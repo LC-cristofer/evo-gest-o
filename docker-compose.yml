@@ -1,0 +1,113 @@
+version: '3.9'
+
+services:
+
+  db:
+    image: postgres:15-alpine
+    container_name: casca-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ong_sistema
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ong_sistema"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    container_name: casca-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: casca-mail
+    restart: unless-stopped
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: casca-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: development
+      PORT: "4000"
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: ong_sistema
+      DB_USER: postgres
+      DB_PASS: postgres123
+      JWT_SECRET: casca_jwt_secret_araucaria_2024_mude_em_producao
+      JWT_REFRESH_SECRET: casca_refresh_secret_araucaria_2024
+      FRONTEND_URL: http://localhost:3000
+      SMTP_HOST: mailhog
+      SMTP_PORT: "1025"
+      SMTP_USER: ""
+      SMTP_PASS: ""
+      SMTP_SECURE: "false"
+      SMTP_FROM: rh@casca-araucaria.org.br
+      ORG_NAME: C.A.S.C.A Araucária
+      # OCR: opcional — sobe separado com docker compose --profile ocr up
+      OCR_SERVICE_URL: http://localhost:5001
+      LOG_LEVEL: info
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - uploads_data:/app/uploads
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: casca-frontend
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_OPTIONS=--max-old-space-size=4096
+      - NEXT_PUBLIC_API_URL=http://localhost:4000/api/v1
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+
+  # OCR: serviço OPCIONAL — só sobe se você rodar:
+  # docker compose --profile ocr up
+  ocr:
+    profiles: ["ocr"]
+    build:
+      context: ./ocr-service
+      dockerfile: Dockerfile
+    container_name: casca-ocr
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    environment:
+      PORT: "5001"
+
+volumes:
+  pg_data:
+  uploads_data:

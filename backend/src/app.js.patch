@@ -1,0 +1,5 @@
+// Novas rotas C.A.S.C.A
+const faqRoutes      = require('./routes/faq.routes');
+const calendarRoutes = require('./routes/calendar.routes');
+const messagesRoutes = require('./routes/messages.routes');
+const minutesRoutes  = require('./routes/minutes.routes');

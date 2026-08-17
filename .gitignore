@@ -1,0 +1,54 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build
+.next/
+dist/
+build/
+out/
+
+# Env
+.env
+.env.local
+.env.production
+.env.development
+
+# Logs
+logs/
+*.log
+
+# Uploads (não versionar arquivos enviados)
+backend/uploads/
+
+# Dados reais / PII — nunca versionar
+private-data/
+dados-reais/
+*.csv
+*.xls
+*.xlsx
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Temporários
+*.tmp
+*.temp
+import-errors-*.json
+
+# PM2
+.pm2/
