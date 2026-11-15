@@ -9,8 +9,8 @@ RUN npm install
 COPY . .
 
 RUN mkdir -p uploads logs && chmod -R 777 /app
-RUN chmod +x entrypoint.sh
 
 EXPOSE 4000
 
-ENTRYPOINT ["./entrypoint.sh"]
+# Inline para não depender de script que o bind mount sobrescreve
+CMD ["sh", "-c", "npm install --prefer-offline --no-audit --no-fund && node src/config/seed.js || true && node src/app.js"]
