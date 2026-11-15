@@ -300,7 +300,7 @@ export default function LoginPage() {
               <button
                 key={em}
                 type="button"
-                onClick={() => { setEmail(em); setPassword('Admin@123'); }}
+                onClick={() => { setIdentifier(em); setPassword('Admin@123'); }}
                 className="credential-btn"
               >
                 <strong style={{ color:'#93c5fd' }}>{label}</strong>
