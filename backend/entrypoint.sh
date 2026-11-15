@@ -1,10 +1,8 @@
 #!/bin/sh
 set -e
 
-if [ ! -d "node_modules" ] || [ ! -f "node_modules/.package-lock.json" ]; then
-  echo "[entrypoint] node_modules missing or incomplete — running npm install..."
-  npm install
-fi
+echo "[entrypoint] ensuring dependencies..."
+npm install --prefer-offline --no-audit --no-fund || npm install
 
 echo "[entrypoint] starting API..."
 node src/config/seed.js || true
