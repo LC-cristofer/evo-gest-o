@@ -137,3 +137,6 @@ export const undoAPI = {
   list:   ()           => api.get('/undo'),
   revert: (id: string) => api.post(`/undo/${id}`),
 };
+
+
+export default api;
