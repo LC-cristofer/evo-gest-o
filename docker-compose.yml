@@ -72,7 +72,7 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
-      - uploads_data:/app/uploads
+      # uploads ficam no host via o bind de ./backend (evita erro de permission denied no Windows)
 
   frontend:
     build:
@@ -110,4 +110,3 @@ services:
 
 volumes:
   pg_data:
-  uploads_data:
